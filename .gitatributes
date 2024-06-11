@@ -1,0 +1,15 @@
+# Define behavior for text files
+
+- text=auto
+
+# Explicitly set line endings for specific file types
+
+_.js text eol=lf
+_.json text eol=lf
+\*.sh text eol=lf
+
+# Binary files (Git will not alter these)
+
+_.png binary
+_.jpg binary
+\*.gif binary
