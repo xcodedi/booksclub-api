@@ -2,19 +2,18 @@ import { User } from "../models";
 
 class UserController {
   async create(req, res) {
-    try {
-      const user = new User({
-        name: "Diego Meira",
-        email: "diego@teste.com.br",
-        password: "teste123",
-        password_hash: "teste1233",
-      });
+    const user = new User({
+      name: "Diego Meira",
+      email: "diego@teste.com.br",
+      password: "teste123",
+      password_hash: "teste1233",
+      reset_password_token: "teste",
+      reset_password_token_sent_at: new Date(),
+      avatar_url: "teste_url",
+    });
 
-      await user.save();
-      return res.json({ user });
-    } catch (error) {
-      return res.status(500).json({ error: "Error creating user" });
-    }
+    await user.save();
+    return res.json({ user });
   }
 }
 
