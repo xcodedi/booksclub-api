@@ -1,15 +1,13 @@
-# Define behavior for text files
+# Ajusta automaticamente os finais de linha conforme o SO
 
 - text=auto
 
-# Explicitly set line endings for specific file types
+# Define finais de linha LF para arquivos específicos
 
-_.js text eol=lf
+_.sh text eol=lf
 _.json text eol=lf
-\*.sh text eol=lf
+\*.yml text eol=lf
 
-# Binary files (Git will not alter these)
+# Linhas para .env
 
-_.png binary
-_.jpg binary
-\*.gif binary
+.env.example text eol=lf
