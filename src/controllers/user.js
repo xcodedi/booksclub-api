@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken"; // Importing jsonwebtoken for JWT operations
 import bcrypt from "bcrypt"; // Importing bcrypt for password hashing
 
 class UserController {
+  // Asynchronous method for user login
   async login(req, res) {
     try {
       // Validation schema for the request body using Yup
@@ -61,6 +62,7 @@ class UserController {
     }
   }
 
+  // Asynchronous method for creating a new user
   async create(req, res) {
     try {
       // Validation schema for creating a new user using Yup
@@ -109,6 +111,28 @@ class UserController {
       return res.status(400).json({ error: error?.message }); // Return a 400 status with the error message in case of validation or other errors
     }
   }
+
+  // Asynchronous method to get a user by ID
+  async getuser(req, res) {
+    // Check if req.userId is falsy (null, undefined, empty string, etc.)
+    if (!req.userId) {
+      // Return a JSON response with a 400 status code and an error message if ID was not provided
+      return res.status(400).json({ error: "Id was not provided" });
+    }
+
+    // Use the User model to find a user in the database where the ID matches req.userId converted to a number
+    const user = await User.findOne({ where: { id: Number(req.userId) } });
+
+    // If user is not found in the database
+    if (!user) {
+      // Return a JSON response with a 404 status code and an error message if user is not found
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Return a JSON response with the user object
+    return res.json(user);
+  }
 }
 
-export default new UserController(); // Export an instance of the UserController class
+// Export an instance of the UserController class with the getuser method
+export default new UserController();
