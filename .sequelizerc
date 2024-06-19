@@ -1,8 +1,8 @@
-const path = require("path");
+const path = require("path"); // Importing Node.js path module
 
 module.exports = {
-  config: path.resolve("src", "config", "config.json"),
-  "models-path": path.resolve("src", "models"),
-  "seeders-path": path.resolve("src", "db", "seeders"),
-  "migrations-path": path.resolve("src", "db", "migrations"),
+  config: path.resolve("src", "config", "config.json"), // Configuration file path resolved to src/config/config.json
+  "models-path": path.resolve("src", "models"), // Models directory path resolved to src/models
+  "seeders-path": path.resolve("src", "db", "seeders"), // Seeders directory path resolved to src/db/seeders
+  "migrations-path": path.resolve("src", "db", "migrations"), // Migrations directory path resolved to src/db/migrations
 };

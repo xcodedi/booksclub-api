@@ -2,6 +2,9 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // This async function defines the migration operation to be executed when migrating up (applying the migration).
+
+    // Create the "Users" table with columns: id, name, email, password, password_hash, createdAt, updatedAt
     await queryInterface.createTable("Users", {
       id: {
         allowNull: false,
@@ -32,6 +35,9 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
+    // This async function defines the migration operation to be executed when rolling back the migration (reverting the migration).
+
+    // Drop (delete) the "Users" table
     await queryInterface.dropTable("Users");
   },
 };
