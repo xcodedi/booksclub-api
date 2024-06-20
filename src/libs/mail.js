@@ -35,7 +35,7 @@ class Mail {
         ],
       });
 
-      return result; // Return the result of sending the email
+      return request; // Return the result of sending the email
     } catch (error) {
       return { error }; // Return an object with the error if sending email fails
     }

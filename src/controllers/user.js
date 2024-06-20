@@ -2,7 +2,8 @@ import { User } from "../models"; // Importing the User model
 import * as Yup from "yup"; // Importing Yup for schema validation
 import jwt from "jsonwebtoken"; // Importing jsonwebtoken for JWT operations
 import bcrypt from "bcrypt"; // Importing bcrypt for password hashing
-import Mail from "../libs/mail";
+import Mail from "../libs/mail"; // Importing Mail for email operations
+import { differenceInHours } from "date-fns"; // Importing differenceInHours from date-fns to calculate time difference
 
 class UserController {
   // Asynchronous method for user login
@@ -145,8 +146,8 @@ class UserController {
       // Validation schema for the request body using Yup
       const schema = Yup.object().shape({
         email: Yup.string()
-          .email("Invalid email format") // Validate email format
-          .required("Email is required"), // Ensure email is present
+          .email("Invalid email") // Validate email format
+          .required("Email is required!"), // Ensure email is present
       });
 
       // Validate the request body against the schema
@@ -157,7 +158,7 @@ class UserController {
 
       // Handle case where user is not found in the database
       if (!user) {
-        return res.status(404).json({ error: "User does not exist" }); // Not found status if user not found
+        return res.status(404).json({ error: "User does not exist!" }); // Not found status if user not found
       }
 
       // Generate a random token and hash it using bcrypt
@@ -175,20 +176,97 @@ class UserController {
       const { email, name } = user;
 
       // Send email with reset password token
+      console.log(
+        `Sending forgot password email to ${email} with token ${token}`
+      );
+
+      // Send forgot password email and capture the result
       const mailResult = await Mail.sendforgotemail(email, name, token);
 
-      // Handle case where the email could not be sent
-      if (!mailResult.success) {
-        return res.status(500).json({ error: "Failed to send reset email" }); // Internal Server Error if email sending fails
-      }
+      console.log({ mailResult }); // Log the result of sending email
 
-      console.log({ mailResult });
+      // Check if sending email was successful
+      if (mailResult.error) {
+        // Return 500 status with error message if email sending failed
+        return res.status(500).json({ error: "Failed to send email." });
+      }
 
       // Return success message in JSON response
       return res.json({ success: true });
     } catch (error) {
+      console.error("Error during forgot password:", error); // Log any errors that occur during the forgot password process
       // Return 400 status with error message in case of validation or other errors
       return res.status(400).json({ error: error?.message });
+    }
+  }
+
+  // Asynchronous method to handle reset password
+  async resetPassword(req, res) {
+    try {
+      // Validation schema for the request body using Yup
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .email("Invalid email") // Validate email format
+          .required("Email is required!"), // Ensure email is present
+        token: Yup.string().required("Token is required"), // Ensure token is present
+        password: Yup.string()
+          .required("Password is required") // Ensure password is present
+          .min(6, "Password must be at least 6 characters long"), // Password must be at least 6 characters long
+      });
+
+      // Validate the request body against the schema
+      await schema.validate(req.body);
+
+      // Find the user based on the email provided in the request
+      const user = await User.findOne({ where: { email: req.body.email } });
+
+      // Handle case where user is not found in the database
+      if (!user) {
+        return res.status(404).json({ error: "User does not exist!" }); // Not found status if user not found
+      }
+
+      // Handle case where reset password token or timestamp is missing
+      if (!user.reset_password_token || !user.reset_password_token_sent_at) {
+        return res.status(400).json({ error: "Password reset not requested" }); // Bad request status if reset not requested
+      }
+
+      // Calculate the difference in hours between the token sent time and the current time
+      const hoursDifference = differenceInHours(
+        new Date(),
+        user.reset_password_token_sent_at
+      );
+
+      // Handle case where the token has expired (more than 2 hours old)
+      if (hoursDifference > 2) {
+        return res.status(400).json({ error: "Token expired" }); // Bad request status if token expired
+      }
+
+      // Compare the token provided in the request with the hashed token stored in the database
+      const isTokenValid = await bcrypt.compare(
+        req.body.token,
+        user.reset_password_token
+      );
+
+      // Handle case where the token comparison fails (invalid token)
+      if (!isTokenValid) {
+        return res.status(401).json({ error: "Invalid token" }); // Unauthorized status if token is invalid
+      }
+
+      // Hash the new password provided in the request
+      const newHashedPassword = await bcrypt.hash(req.body.password, 8);
+
+      // Update user with the new hashed password and clear the reset token and timestamp
+      await user.update({
+        password_hash: newHashedPassword,
+        reset_password_token: null,
+        reset_password_token_sent_at: null,
+      });
+
+      // Return success message in JSON response
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("Error during reset password:", error); // Log any errors that occur during the reset password process
+      return res.status(400).json({ error: error?.message }); // Return a 400 status with the error message in case of validation or other errors
     }
   }
 }

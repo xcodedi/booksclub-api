@@ -7,7 +7,8 @@ const routes = new Router();
 // unauthenticated routes
 routes.post("/user", UserController.create); // Route for creating a new user
 routes.post("/login", UserController.login); // Route for user login
-routes.post("/forgotpassword", UserController.forgotPassword); // Route for requesting password reset
+routes.post("/forgotpassword", UserController.forgotPassword); // Route for requesting password forgot
+routes.post("/resetpassword", UserController.resetPassword); // Route for requesting password reset
 
 // authenticated routes
 routes.use(authMiddleware); // Middleware to ensure authentication for the following routes
