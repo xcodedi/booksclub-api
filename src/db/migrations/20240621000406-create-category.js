@@ -6,11 +6,8 @@ module.exports = {
   // Export the migration configuration as a module
   async up(queryInterface, Sequelize) {
     // Define an asynchronous function named 'up' for applying the migration
-    // This async function defines the migration operation to be executed when migrating up (applying the migration).
-
-    // Create the "Users" table with columns: id, name, email, password, password_hash, createdAt, updatedAt
-    await queryInterface.createTable("Users", {
-      // Use queryInterface to create a table named "Users"
+    await queryInterface.createTable("Categories", {
+      // Use queryInterface to create a table named "Categories"
       id: {
         // Define the 'id' column
         allowNull: false, // The 'id' column cannot be null
@@ -21,18 +18,12 @@ module.exports = {
       name: {
         // Define the 'name' column
         type: Sequelize.STRING, // The 'name' column is of type STRING
+        allowNull: false, // The 'name' column cannot be null
       },
-      email: {
-        // Define the 'email' column
-        type: Sequelize.STRING, // The 'email' column is of type STRING
-      },
-      password: {
-        // Define the 'password' column
-        type: Sequelize.STRING, // The 'password' column is of type STRING
-      },
-      password_hash: {
-        // Define the 'password_hash' column
-        type: Sequelize.STRING, // The 'password_hash' column is of type STRING
+      highlighted: {
+        // Define the 'highlighted' column
+        type: Sequelize.BOOLEAN, // The 'highlighted' column is of type BOOLEAN
+        defaultValue: false, // The default value for 'highlighted' is false
       },
       createdAt: {
         // Define the 'createdAt' column
@@ -49,9 +40,6 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     // Define an asynchronous function named 'down' for reverting the migration
-    // This async function defines the migration operation to be executed when rolling back the migration (reverting the migration).
-
-    // Drop (delete) the "Users" table
-    await queryInterface.dropTable("Users"); // Use queryInterface to drop the "Users" table
+    await queryInterface.dropTable("Categories"); // Use queryInterface to drop the "Categories" table
   },
 };
