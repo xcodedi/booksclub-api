@@ -2,6 +2,7 @@ import { Router } from "express"; // Import the Router class from the Express li
 import UserController from "../controllers/user"; // Import the UserController from the controllers directory (ensure the path is correct)
 import authMiddleware from "../middlewares/auth"; // Import the authentication middleware
 import CategoryController from "../controllers/category"; // Import the CategoryController from the controllers directory
+import AuthorController from "../controllers/author"; // Import the AuthorController from the controllers directory
 
 const routes = new Router(); // Create a new instance of Router
 
@@ -15,5 +16,7 @@ routes.post("/resetpassword", UserController.resetPassword); // Define a POST ro
 routes.use(authMiddleware); // Use the authentication middleware to protect the following routes
 routes.get("/user/", UserController.getuser); // Define a GET route for retrieving user information
 routes.get("/category", CategoryController.getAll); // Define a GET route for retrieving all categories
+routes.post("/author", AuthorController.create); // Define a POST route for creating a new author
+routes.get("/author", AuthorController.getAll); // Define a GET route for retrieving all authors
 
 export default routes; // Export the configured routes as the default export
