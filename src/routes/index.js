@@ -3,6 +3,7 @@ import UserController from "../controllers/user"; // Import the UserController f
 import authMiddleware from "../middlewares/auth"; // Import the authentication middleware
 import CategoryController from "../controllers/category"; // Import the CategoryController from the controllers directory
 import AuthorController from "../controllers/author"; // Import the AuthorController from the controllers directory
+import BookController from "../controllers/book";
 
 const routes = new Router(); // Create a new instance of Router
 
@@ -18,5 +19,7 @@ routes.get("/user/", UserController.getuser); // Define a GET route for retrievi
 routes.get("/category", CategoryController.getAll); // Define a GET route for retrieving all categories
 routes.post("/author", AuthorController.create); // Define a POST route for creating a new author
 routes.get("/author", AuthorController.getAll); // Define a GET route for retrieving all authors
+routes.post("/book", BookController.create);
+routes.get("/book", BookController.getAll);
 
 export default routes; // Export the configured routes as the default export
