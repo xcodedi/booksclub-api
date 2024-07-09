@@ -5,7 +5,14 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     // Defining the User model that extends Sequelize's Model class
 
-    static associate(models) {} // Static method to define associations with other models
+    static associate(models) {
+      // Method to define associations with other models
+      this.belongsToMany(models.Book, {
+        through: models.UserBook, // Define the through model for the N:N relationship
+        foreignKey: "user_id", // Foreign key in the through model
+        as: "books",
+      });
+    }
   }
 
   User.init(
