@@ -5,6 +5,7 @@ import CategoryController from "../controllers/category"; // Import the Category
 import AuthorController from "../controllers/author"; // Import the AuthorController from the controllers directory
 import BookController from "../controllers/book"; // Import the BookController from the controllers directory
 import UserBookController from "../controllers/userbook"; // Import the UserBookController from the controllers directory
+import SearchController from "../controllers/search";
 
 const routes = Router(); // Create a new instance of Router
 
@@ -25,5 +26,6 @@ routes.get("/book", BookController.getAll); // Define a GET route for retrieving
 routes.post("/userbook", UserBookController.create); // Define a POST route for creating a new user-book association
 routes.get("/userbook", UserBookController.getAll); // Define a GET route for retrieving all user-book associations
 routes.delete("/userbook/:userBookId", UserBookController.delete); // Define a DELETE route for deleting a user-book association
+routes.get("/search", SearchController.get);
 
 export default routes; // Export the configured routes as the default export

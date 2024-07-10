@@ -9,18 +9,21 @@ module.exports = {
     return queryInterface.bulkInsert("Categories", [
       // Use queryInterface to bulk insert records into the "Categories" table
       {
+        id: 1,
         name: "sports", // Set the name of the category to "sports"
         highlighted: false, // Set the highlighted attribute to false
         createdAt: new Date(), // Set the createdAt attribute to the current date and time
         updatedAt: new Date(), // Set the updatedAt attribute to the current date and time
       },
       {
+        id: 2,
         name: "cooking", // Set the name of the category to "cooking"
         highlighted: false, // Set the highlighted attribute to false
         createdAt: new Date(), // Set the createdAt attribute to the current date and time
         updatedAt: new Date(), // Set the updatedAt attribute to the current date and time
       },
       {
+        id: 3,
         name: "fiction", // Set the name of the category to "fiction"
         highlighted: false, // Set the highlighted attribute to false
         createdAt: new Date(), // Set the createdAt attribute to the current date and time
