@@ -1,7 +1,3 @@
-import { User } from "../models"; // Importing the User model
-import * as Yup from "yup"; // Importing Yup for schema validation
-import jwt from "jsonwebtoken"; // Importing jsonwebtoken for JWT operations
-import bcrypt from "bcrypt"; // Importing bcrypt for password hashing
 import Mail from "../libs/mail"; // Importing Mail for email operations
 import { differenceInHours } from "date-fns"; // Importing differenceInHours from date-fns to calculate time difference
 
@@ -111,6 +107,86 @@ class UserController {
     } catch (error) {
       console.error("Error during user creation:", error); // Log any errors that occur during the user creation process
       return res.status(400).json({ error: error?.message }); // Return a 400 status with the error message in case of validation or other errors
+    }
+  }
+
+  // Asynchronous method for updating a user
+  async update(req, res) {
+    try {
+      const { userId } = req;
+      const { name, email, password } = req.body;
+
+      // Find the user based on the userId
+      const user = await User.findOne({ where: { id: userId } });
+
+      // Handle case where user is not found in the database
+      if (!user) {
+        return res.status(404).json({ error: "User not found." });
+      }
+
+      // Update user details if they are provided in the request body
+      if (name) user.name = name;
+      if (email) user.email = email;
+      if (password) {
+        user.password_hash = await bcrypt.hash(password, 8);
+      }
+
+      // Save the updated user instance to the database
+      await user.save();
+
+      // Return the updated user data in the response
+      return res.json({ user });
+    } catch (error) {
+      console.error("Error during user update:", error); // Log any errors that occur during the user update process
+      return res.status(400).json({ error: error?.message }); // Return a 400 status with the error message in case of validation or other errors
+    }
+  }
+
+  async updateAvatar(req, res) {
+    // Define validation schema for base64 and mime type
+    const schema = yup.object().shape({
+      base64: yup.string().required("Base64 is required"),
+      mime: yup.string().required("MIME type is required"),
+    });
+
+    try {
+      // Validate the request body against the schema
+      await schema.validate(req.body);
+
+      const { base64, mime } = req.body;
+
+      // Extract the base64 data and decode it
+      const base64Data = base64.replace(/^data:image\/\w+;base64,/, ""); // Remove data URL scheme
+      const buffer = Buffer.from(base64Data, "base64"); // Convert base64 to binary buffer
+
+      // Generate a unique file name for the avatar
+      const fileName = `${uuidv4()}.${mime.split("/")[1]}`;
+      const filePath = path.join(
+        __dirname,
+        "..",
+        "uploads",
+        "avatars",
+        fileName
+      );
+
+      // Save the buffer to a file
+      fs.writeFileSync(filePath, buffer);
+
+      // Update the user with the new avatar path or URL
+      const user = await User.findByPk(req.userId); // Assuming userId is in req object
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Update user's avatar URL in the database
+      user.avatar_url = `/uploads/avatars/${fileName}`;
+      await user.save();
+
+      // Return the updated user data
+      return res.json({ user });
+    } catch (error) {
+      console.error("Error during avatar update:", error);
+      return res.status(400).json({ error: error.message });
     }
   }
 

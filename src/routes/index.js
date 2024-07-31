@@ -26,6 +26,8 @@ routes.get("/book", BookController.getAll); // Define a GET route for retrieving
 routes.post("/userbook", UserBookController.create); // Define a POST route for creating a new user-book association
 routes.get("/userbook", UserBookController.getAll); // Define a GET route for retrieving all user-book associations
 routes.delete("/userbook/:userBookId", UserBookController.delete); // Define a DELETE route for deleting a user-book association
-routes.get("/search", SearchController.get);
+routes.get("/search", SearchController.get); // Define a GET route for searching
+routes.put("/user", UserController.update); // Define a PUT route for updating user information
+routes.put("/user/avatar", UserController.updateAvatar); // Define a PUT route for updating the user avatar
 
 export default routes; // Export the configured routes as the default export

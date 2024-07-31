@@ -31,11 +31,7 @@ class BookController {
         return res.status(404).json({ error: "Author not found" });
       }
 
-      const book = await new Book({
-        ...req.body,
-      });
-
-      await book.save();
+      const book = await Book.create({ ...req.body });
 
       return res.status(201).json(book);
     } catch (err) {
@@ -44,11 +40,17 @@ class BookController {
   }
 
   async getAll(req, res) {
+    const { highlighted } = req.query;
+
+    const whereClause =
+      highlighted !== undefined ? { highlighted: highlighted === "true" } : {};
+
     try {
       const books = await Book.findAll({
+        where: whereClause,
         include: [
-          { model: Author, as: "author" },
-          { model: Category, as: "category" },
+          { model: Author, as: "author", attributes: ["name"] },
+          { model: Category, as: "category", attributes: ["category"] },
         ],
       });
 

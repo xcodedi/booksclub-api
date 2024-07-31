@@ -61,7 +61,7 @@ class UserBookController {
         where: {
           user_id: req.userId,
         },
-        include: [{ model: Book, as: "book" }], // Include the Book model with alias 'book'
+        include: [{ model: Book, as: "book", attibutes: ["author"] }], // Include the Book model with alias 'book'
       });
 
       // Return the list of UserBooks as JSON response
