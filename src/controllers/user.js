@@ -1,6 +1,13 @@
 import Mail from "../libs/mail"; // Importing Mail for email operations
 import { differenceInHours } from "date-fns"; // Importing differenceInHours from date-fns to calculate time difference
 
+// Configure AWS SDK
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
 class UserController {
   // Asynchronous method for user login
   async login(req, res) {
@@ -143,49 +150,40 @@ class UserController {
   }
 
   async updateAvatar(req, res) {
-    // Define validation schema for base64 and mime type
-    const schema = yup.object().shape({
-      base64: yup.string().required("Base64 is required"),
-      mime: yup.string().required("MIME type is required"),
+    // Define a schema for validation using Yup
+    const schema = Yup.object().shape({
+      base64: Yup.string().required("Base64 is obligatory"), // Validate that base64 is a string and required
+      mime: Yup.string().required("MIME type is obligatory"), // Validate that mime is a string and required
     });
 
     try {
       // Validate the request body against the schema
       await schema.validate(req.body);
 
-      const { base64, mime } = req.body;
-
-      // Extract the base64 data and decode it
-      const base64Data = base64.replace(/^data:image\/\w+;base64,/, ""); // Remove data URL scheme
-      const buffer = Buffer.from(base64Data, "base64"); // Convert base64 to binary buffer
-
-      // Generate a unique file name for the avatar
-      const fileName = `${uuidv4()}.${mime.split("/")[1]}`;
-      const filePath = path.join(
-        __dirname,
-        "..",
-        "uploads",
-        "avatars",
-        fileName
-      );
-
-      // Save the buffer to a file
-      fs.writeFileSync(filePath, buffer);
-
-      // Update the user with the new avatar path or URL
-      const user = await User.findByPk(req.userId); // Assuming userId is in req object
+      // Find the user by primary key (ID) using the userId from the authenticated request
+      const user = await User.findByPk(req.userId);
       if (!user) {
+        // If the user is not found, return a 404 error
         return res.status(404).json({ error: "User not found" });
       }
 
-      // Update user's avatar URL in the database
-      user.avatar_url = `/uploads/avatars/${fileName}`;
+      // Destructure base64 and mime from the request body
+      const { base64, mime } = req.body;
+      // Generate a unique key for the avatar using the user ID and a UUID
+      const key = `avatars/${user.id}_${uuidv4()}`;
+
+      // Upload the image to AWS S3 and get the URL of the uploaded image
+      const avatarUrl = await UploadImage.upload(key, base64, mime);
+
+      // Update the user's avatar URL in the database
+      user.avatar_url = avatarUrl;
       await user.save();
 
-      // Return the updated user data
+      // Return the updated user information as a JSON response
       return res.json({ user });
     } catch (error) {
-      console.error("Error during avatar update:", error);
+      // Log the error to the console and return a 400 error with the error message
+      console.error("Error updating avatar:", error);
       return res.status(400).json({ error: error.message });
     }
   }

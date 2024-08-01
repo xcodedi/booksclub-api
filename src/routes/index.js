@@ -5,7 +5,7 @@ import CategoryController from "../controllers/category"; // Import the Category
 import AuthorController from "../controllers/author"; // Import the AuthorController from the controllers directory
 import BookController from "../controllers/book"; // Import the BookController from the controllers directory
 import UserBookController from "../controllers/userbook"; // Import the UserBookController from the controllers directory
-import SearchController from "../controllers/search";
+import SearchController from "../controllers/search"; // Import the SearchController from the controllers directory
 
 const routes = Router(); // Create a new instance of Router
 
@@ -17,7 +17,10 @@ routes.post("/resetpassword", UserController.resetPassword); // Define a POST ro
 
 // Authenticated routes
 routes.use(authMiddleware); // Use the authentication middleware to protect the following routes
+
 routes.get("/user", UserController.getuser); // Define a GET route for retrieving user information
+routes.put("/user/avatar", UserController.updateAvatar); // Define a PUT route for updating the user avatar
+
 routes.get("/category", CategoryController.getAll); // Define a GET route for retrieving all categories
 routes.post("/author", AuthorController.create); // Define a POST route for creating a new author
 routes.get("/author", AuthorController.getAll); // Define a GET route for retrieving all authors
@@ -28,6 +31,5 @@ routes.get("/userbook", UserBookController.getAll); // Define a GET route for re
 routes.delete("/userbook/:userBookId", UserBookController.delete); // Define a DELETE route for deleting a user-book association
 routes.get("/search", SearchController.get); // Define a GET route for searching
 routes.put("/user", UserController.update); // Define a PUT route for updating user information
-routes.put("/user/avatar", UserController.updateAvatar); // Define a PUT route for updating the user avatar
 
 export default routes; // Export the configured routes as the default export
