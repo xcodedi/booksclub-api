@@ -51,6 +51,27 @@ class UploadImage {
       throw error;
     }
   }
+  // Method for deleting an image from S3
+  async delete(key) {
+    try {
+      // Define parameters for the S3 delete
+      const params = {
+        Bucket: AWS_BUCKET_NAME, // The S3 bucket name
+        Key: key, // The key (path) of the file to delete in S3
+      };
+
+      // Create a new S3 instance
+      const s3 = new AWS.S3({ apiVersion: "2006-03-01" });
+
+      // Delete the file from S3 and return the response
+      const response = await s3.deleteObject(params).promise(); // Wait for the delete to complete
+      return response; // Return the response of the delete operation
+    } catch (error) {
+      // Log and throw any errors that occur during the delete
+      console.error("Error deleting image:", error);
+      throw error;
+    }
+  }
 }
 
 // Export an instance of the UploadImage class

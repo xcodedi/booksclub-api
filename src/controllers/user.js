@@ -167,12 +167,23 @@ class UserController {
         return res.status(404).json({ error: "User not found" });
       }
 
+      // If the user already has an avatar, delete the old avatar from S3
+      if (user.avatar_url) {
+        const splitted = user.avatar_url.split("/"); // Split the URL by '/'
+        const oldKey = splitted[splitted.length - 1]; // Get the last part of the URL, which is the key
+        const deleteResponse = await UploadImage.delete(oldKey); // Delete the old avatar from S3
+        console.log("Delete response:", deleteResponse);
+        if (deleteResponse.error) {
+          return res.status(500).json({ error: deleteResponse.error });
+        }
+      }
+
       // Destructure base64 and mime from the request body
       const { base64, mime } = req.body;
-      // Generate a unique key for the avatar using the user ID and a UUID
+      // Generate a unique key for the new avatar using the user ID and a UUID
       const key = `avatars/${user.id}_${uuidv4()}`;
 
-      // Upload the image to AWS S3 and get the URL of the uploaded image
+      // Upload the new image to AWS S3 and get the URL of the uploaded image
       const avatarUrl = await UploadImage.upload(key, base64, mime);
 
       // Update the user's avatar URL in the database
